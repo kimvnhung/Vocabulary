@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutparent_add_word_add"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_add_word">
+
+    <RelativeLayout
+        android:id="@+id/layout_quel_de_neuf_add"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+        <TextView
+            android:id="@+id/text_view_quel_de_neuf_add"
+            android:layout_width="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:text="@string/quelle_de_neuf"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="10dp" />
+        <EditText
+            android:id="@+id/edit_text_add_new_add"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/text_view_quel_de_neuf_add"
+            android:layout_marginLeft="15dp" />
+
+        <LinearLayout
+            android:id="@+id/layout_spinner_add"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/edit_text_add_new_add">
+            <Spinner
+                android:id="@+id/spinner_type_word_add"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Spinner>
+            <Spinner
+                android:layout_weight="1"
+                android:id="@+id/spinner_type_word_lv2_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+            </Spinner>
+        </LinearLayout>
+        <Button
+            android:id="@+id/button_soundof_new_word_add"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:onClick="soundFranceWordClicked"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_en_anglais_add"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/layout_quel_de_neuf_add">
+
+        <TextView
+            android:id="@+id/text_view_en_anglais_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/en_anglais"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="10dp" />
+        <EditText
+            android:id="@+id/edit_text_en_anglais_add"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/text_view_en_anglais_add"
+            android:layout_marginLeft="15dp"/>
+
+        <Button
+            android:id="@+id/button_soundof_en_anglais_add"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:onClick="soundEnglishWordClicked"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_en_vietnamien_add"
+        android:layout_below="@+id/layout_en_anglais_add"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <TextView
+            android:id="@+id/text_view_en_vietnamien_add"
+            android:text="@string/en_vietnamien"
+            android:paddingLeft="10dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/edit_text_en_vietnamien_add"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@+id/text_view_en_vietnamien_add"
+            android:layout_marginLeft="15dp"/>
+        <Button
+            android:id="@+id/button_another_meaning_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="un Autre"
+            android:onClick="unAutreClicked"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/button_save_add"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ajouter_le_mot"
+        android:onClick="saveAddClicked"/>
+</RelativeLayout>
