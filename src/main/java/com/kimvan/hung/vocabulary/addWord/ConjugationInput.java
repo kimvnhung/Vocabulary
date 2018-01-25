@@ -91,7 +91,6 @@ public class ConjugationInput extends AppCompatActivity implements GestureDetect
 
     public void saveConjugatonClicked(View view){
         verbWordMeaning.setLesTemps(conjugationArrayList);
-        dbHandler.addConjugation(verbWordMeaning);
         intent = new Intent(this,AddWordActivity.class);
         startActivity(intent);
         Toast.makeText(this,R.string.add_complete,Toast.LENGTH_SHORT).show();

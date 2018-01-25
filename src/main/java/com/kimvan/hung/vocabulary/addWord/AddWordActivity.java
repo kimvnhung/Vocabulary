@@ -41,6 +41,8 @@ import com.kimvan.hung.vocabulary.dataBase.NormalWordMeaning;
 import com.kimvan.hung.vocabulary.dataBase.NouveauMot;
 import com.kimvan.hung.vocabulary.dataBase.VerbWordMeaning;
 
+import java.util.ArrayList;
+
 public class AddWordActivity extends AppCompatActivity {
 
     Intent intent;
@@ -48,6 +50,7 @@ public class AddWordActivity extends AppCompatActivity {
     String[] type_word;
     String[] type_verb;
     String[] type_sex;
+    ArrayList<NormalWordMeaning> listMeaning = new ArrayList<>();
 
     EditText nouveau_mot;
     EditText new_word;
@@ -59,7 +62,10 @@ public class AddWordActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Spinner spinner_type_word;
     Spinner spinner_type_lv2;
+
+    Boolean isCreateWordByAutre=false;
     Boolean spinner_lv2_check;
+
 
     DataBaseHandler dbHandler;
 
@@ -90,264 +96,37 @@ public class AddWordActivity extends AppCompatActivity {
         String nouveau_mot_para = nouveau_mot.getText().toString();
         String new_word_para = new_word.getText().toString();
         String tu_moi_para = tu_moi.getText().toString();
-        String type_word_para = spinner_type_word.getSelectedItem().toString();
-        String lv2_para = spinner_type_lv2.getSelectedItem().toString();
-        Cursor c = new Cursor() {
-            @Override
-            public int getCount() {
-                return 0;
-            }
-
-            @Override
-            public int getPosition() {
-                return 0;
-            }
-
-            @Override
-            public boolean move(int offset) {
-                return false;
-            }
-
-            @Override
-            public boolean moveToPosition(int position) {
-                return false;
-            }
-
-            @Override
-            public boolean moveToFirst() {
-                return false;
-            }
-
-            @Override
-            public boolean moveToLast() {
-                return false;
-            }
-
-            @Override
-            public boolean moveToNext() {
-                return false;
-            }
-
-            @Override
-            public boolean moveToPrevious() {
-                return false;
-            }
-
-            @Override
-            public boolean isFirst() {
-                return false;
-            }
-
-            @Override
-            public boolean isLast() {
-                return false;
-            }
-
-            @Override
-            public boolean isBeforeFirst() {
-                return false;
-            }
-
-            @Override
-            public boolean isAfterLast() {
-                return false;
-            }
-
-            @Override
-            public int getColumnIndex(String columnName) {
-                return 0;
-            }
-
-            @Override
-            public int getColumnIndexOrThrow(String columnName) throws IllegalArgumentException {
-                return 0;
-            }
-
-            @Override
-            public String getColumnName(int columnIndex) {
-                return null;
-            }
-
-            @Override
-            public String[] getColumnNames() {
-                return new String[0];
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 0;
-            }
-
-            @Override
-            public byte[] getBlob(int columnIndex) {
-                return new byte[0];
-            }
-
-            @Override
-            public String getString(int columnIndex) {
-                return null;
-            }
-
-            @Override
-            public void copyStringToBuffer(int columnIndex, CharArrayBuffer buffer) {
-
-            }
-
-            @Override
-            public short getShort(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public int getInt(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public long getLong(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public float getFloat(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public double getDouble(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public int getType(int columnIndex) {
-                return 0;
-            }
-
-            @Override
-            public boolean isNull(int columnIndex) {
-                return false;
-            }
-
-            @Override
-            public void deactivate() {
-
-            }
-
-            @Override
-            public boolean requery() {
-                return false;
-            }
-
-            @Override
-            public void close() {
-
-            }
-
-            @Override
-            public boolean isClosed() {
-                return false;
-            }
-
-            @Override
-            public void registerContentObserver(ContentObserver observer) {
-
-            }
-
-            @Override
-            public void unregisterContentObserver(ContentObserver observer) {
-
-            }
-
-            @Override
-            public void registerDataSetObserver(DataSetObserver observer) {
-
-            }
-
-            @Override
-            public void unregisterDataSetObserver(DataSetObserver observer) {
-
-            }
-
-            @Override
-            public void setNotificationUri(ContentResolver cr, Uri uri) {
-
-            }
-
-            @Override
-            public Uri getNotificationUri() {
-                return null;
-            }
-
-            @Override
-            public boolean getWantsAllOnMoveCalls() {
-                return false;
-            }
-
-            @Override
-            public void setExtras(Bundle extras) {
-
-            }
-
-            @Override
-            public Bundle getExtras() {
-                return null;
-            }
-
-            @Override
-            public Bundle respond(Bundle extras) {
-                return null;
-            }
-        };
-        try {
-            c = dbHandler.getWritableDatabase().rawQuery(
-                    "SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+dbHandler.COLUMN_LE_MOT+"=\""+
-                            nouveau_mot_para+"\"",null);
-
-        }catch (Exception e){
-            e.getMessage();
-        }
 
         if (nouveau_mot.getText().toString().equals("")){
             //kiểm tra xem đã nhập từ hay chưa
             Toast.makeText(this,"Chưa điền từ mới",Toast.LENGTH_SHORT).show();
-        }else if (c.getCount()>0){
+        }else if (dbHandler.isExistItem(dbHandler.TABLE_NAME_VOCABULARY,dbHandler.COLUMN_LE_MOT,nouveau_mot_para)){
+            //kiểm tra xem từ đã tồn tại hay chưa?
             Toast.makeText(this,"Từ đã tồn tại",Toast.LENGTH_SHORT).show();
-        }else if (haveSpace(nouveau_mot_para)){
-            Toast.makeText(getApplicationContext(),"Không được để dấu cách!",Toast.LENGTH_SHORT).show();
         }else {
-
-
-            try {
-                //kiểm tra xem đã tạo bảng meaning hay chưa
-                c = dbHandler.getWritableDatabase().rawQuery("SELECT * FROM "+nouveau_mot_para+" WHERE 1",null);
-            }catch (Exception e){
-                //tạo bảng meaning hoặc conjugation khi chưa có
-                dbHandler.createAnotherTable(nouveau_mot_para,type_word_para);
+            if (!dbHandler.isExistTableMeaning()){//kiểm tra xem đã tồn tại bảng meaning hay chưa
+                dbHandler.createTableMeaning();
             }
+            if (!((!new_word_para.equals("")&& tu_moi_para.equals(""))
+                    ||(new_word_para.equals("")&& !tu_moi_para.equals(""))
+                    || (listMeaning.size()==0 && new_word_para.equals("")))){
+                addWord();
+                if (1==0/*spinner_type_word.getSelectedItem().toString().equals("le verbe")*/){
+                    intent = new Intent(this,ConjugationInput.class);
+                    intent.putExtra("leMot",nouveau_mot_para);
+                    intent.putExtra("enAnglais",new_word_para);
+                    intent.putExtra("enVietnamien",tu_moi_para);
+                    startActivity(intent);
+                    Toast.makeText(this,"Chia động từ",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(this,R.string.add_complete,Toast.LENGTH_SHORT).show();
+                }
+                nouveau_mot.setText("");
+                new_word.setText("");
+                tu_moi.setText("");
 
-            if (spinner_lv2_check){
-                dbHandler.addWord(new NouveauMot(nouveau_mot_para,type_word_para,lv2_para));
-            }else {
-                dbHandler.addWord(new NouveauMot(nouveau_mot_para,type_word_para,""));
-            }
-            if (new_word_para.length()>0 && tu_moi_para.length()>0){
-                dbHandler.addMeaning(new NormalWordMeaning(nouveau_mot_para,new_word_para,tu_moi_para));
-            }
-
-
-            if (1==0/*spinner_type_word.getSelectedItem().toString().equals("le verbe")*/){
-                intent = new Intent(this,ConjugationInput.class);
-                intent.putExtra("leMot",nouveau_mot_para);
-                intent.putExtra("enAnglais",new_word_para);
-                intent.putExtra("enVietnamien",tu_moi_para);
-                startActivity(intent);
-                Toast.makeText(this,"Chia động từ",Toast.LENGTH_SHORT).show();
-            }else {
-                Toast.makeText(this,R.string.add_complete,Toast.LENGTH_SHORT).show();
-            }
-            nouveau_mot.setText("");
-            new_word.setText("");
-            tu_moi.setText("");
+            }else
+                Toast.makeText(getApplicationContext(),"Chưa điền đủ nghĩa",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -363,6 +142,8 @@ public class AddWordActivity extends AppCompatActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setText(text);
     }
+
+    // unAutre is clicked
     public void unAutreClicked(View view){
         if (nouveau_mot.getText().toString().equals("")){
             Toast.makeText(this,"Chưa điền từ mới!",Toast.LENGTH_SHORT).show();
@@ -370,15 +151,7 @@ public class AddWordActivity extends AppCompatActivity {
             Toast.makeText(this,"Chưa nhập đủ nghĩa!",Toast.LENGTH_SHORT).show();
         }
         else {
-            try {
-                Cursor c = dbHandler.getWritableDatabase().rawQuery("SELECT * FROM "+nouveau_mot.getText().toString()+" WHERE 1",null);
-
-            }catch (Exception e){
-                dbHandler.createAnotherTable(nouveau_mot.getText().toString(),null);
-                e.getMessage();
-            }
-            dbHandler.addMeaning(new NormalWordMeaning(nouveau_mot.getText().toString(),
-                    new_word.getText().toString(),tu_moi.getText().toString()));
+            listMeaning.add(new NormalWordMeaning(new_word.getText().toString(),tu_moi.getText().toString()));
             new_word.setText("");
             tu_moi.setText("");
         }
@@ -482,7 +255,6 @@ public class AddWordActivity extends AppCompatActivity {
             Cursor c = dbHandler.getWritableDatabase().rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+
                     dbHandler.COLUMN_LE_MOT+"=\""+tableDust+"\"",null);
             if (c.getCount()==0){
-                dbHandler.deleteTable(tableDust);
                 if (!tableDust.equals("")){
                     Toast.makeText(getApplicationContext(),"Chưa lưu từ "+tableDust,Toast.LENGTH_SHORT).show();
                 }
@@ -494,13 +266,38 @@ public class AddWordActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.homeActivity)
-            finish();
-        return super.onOptionsItemSelected(item);
-    }*/
+    public void addWord(){
+        String nouveau_mot_para = nouveau_mot.getText().toString();
+        String type_word_para = spinner_type_word.getSelectedItem().toString();
+        String lv2_para = spinner_type_lv2.getSelectedItem().toString();
+        String new_word_para = new_word.getText().toString();
+        String tu_moi_para = tu_moi.getText().toString();
 
+        if (spinner_lv2_check){
+            dbHandler.addWord(new NouveauMot(nouveau_mot_para,type_word_para,lv2_para));
+        }else {
+            dbHandler.addWord(new NouveauMot(nouveau_mot_para,type_word_para,""));
+        }
+        String id = dbHandler.getNouveauMot(nouveau_mot_para).get_id();
+
+        //lưu nghĩa cuối nếu ko rỗng
+        if (!(new_word_para.equals("") || tu_moi_para.equals(""))){
+            listMeaning.add(new NormalWordMeaning(id,"",new_word_para,tu_moi_para));
+        }
+
+        for (NormalWordMeaning x:listMeaning){
+            x.set_id(id);
+            dbHandler.addMeaning(x);
+        }
+        //reset listMeaning
+        listMeaning.clear();
+
+        //thêm nghĩa hiện tại
+        if (new_word_para.length()>0 && tu_moi_para.length()>0){
+            dbHandler.addMeaning(new NormalWordMeaning(id,"",new_word_para,tu_moi_para));
+        }
+
+    }
 
 
     // hide keyboard when tap outside of EditText

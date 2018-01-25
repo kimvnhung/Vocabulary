@@ -131,7 +131,7 @@ public class InformationActivity extends AppCompatActivity {
                 })
         );
 
-        prepareData("");
+
 
 
         entrerMot = (EditText)findViewById(R.id.mot_pour_trouver_edittxt);
@@ -155,7 +155,7 @@ public class InformationActivity extends AppCompatActivity {
         });
 
         numberListItem = (TextView)findViewById(R.id.number_list_item_information);
-        numberListItem.setText("0/"+nouveauMotList.size());
+        prepareData("");
     }
 
     @Override
@@ -171,6 +171,7 @@ public class InformationActivity extends AppCompatActivity {
         switch (positonItem){
             case 0:
                 dbHandler.deleteWord(nouveauMotList.get(positionMot).get_id());
+
                 prepareData(entrerMot.getText().toString());
                 break;
             default:
@@ -190,7 +191,7 @@ public class InformationActivity extends AppCompatActivity {
 
     public void prepareData(String searchWord){
          nouveauMotList.clear();
-         ArrayList<NouveauMot> para = dbHandler.searchNouveauMot(searchWord,dbHandler.COLUMN_ID);
+         ArrayList<NouveauMot> para = dbHandler.searchNouveauMot(searchWord,dbHandler.COLUMN_LE_MOT);
          for (NouveauMot x:para) {
              nouveauMotList.add(x);
          }
@@ -198,6 +199,7 @@ public class InformationActivity extends AppCompatActivity {
              Toast.makeText(this,"La liste est vide!",Toast.LENGTH_SHORT).show();
          }
          wordPropertiesAdapter.notifyDataSetChanged();
+        numberListItem.setText("0/"+nouveauMotList.size());
     }
 
     // hide keyboard when tap outside of EditText

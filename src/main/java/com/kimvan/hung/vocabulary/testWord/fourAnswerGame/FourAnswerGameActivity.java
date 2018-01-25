@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +17,9 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kimvan.hung.vocabulary.MainActivity;
 import com.kimvan.hung.vocabulary.R;
@@ -26,6 +30,8 @@ import com.kimvan.hung.vocabulary.dataBase.NouveauMot;
 import java.util.ArrayList;
 
 public class FourAnswerGameActivity extends AppCompatActivity {
+
+    RelativeLayout questionLayout;
 
     TextView show_le_mot;
     TextView answer1;
@@ -40,6 +46,7 @@ public class FourAnswerGameActivity extends AppCompatActivity {
     ArrayList<NouveauMot> checkDoubleAskArr = new ArrayList<>();
     NormalWordMeaning normalWordMeaning;
     String[] answer = new String[4];
+
 
 
     @Override
@@ -64,7 +71,10 @@ public class FourAnswerGameActivity extends AppCompatActivity {
                 return true;
             }
         }
-        if (checkDoubleAskArr.size()==4){
+        //số từ giới hạn 1 lần lặp lại
+        double sPercent = dbHandler.getTableCount(dbHandler.TABLE_NAME_VOCABULARY)*0.1;
+        int distanceRepeat = (int) (sPercent>4?sPercent:4);
+        if (checkDoubleAskArr.size()==distanceRepeat){
             checkDoubleAskArr.remove(0);
         }
         checkDoubleAskArr.add(nouveauMot);
@@ -73,6 +83,7 @@ public class FourAnswerGameActivity extends AppCompatActivity {
 
     // set up nội dung câu hỏi
     public void setContentAsking(){
+        setClickableAnswer(true);
         do {
             answer = game1Handler.getAnswer();
             nouveauMot = game1Handler.getNouveauMotSelected();
@@ -113,7 +124,21 @@ public class FourAnswerGameActivity extends AppCompatActivity {
         return answer;
     }
 
+
     private void setId(){
+
+        questionLayout = (RelativeLayout)findViewById(R.id.layout_question_4answer_game);
+        questionLayout.setOnLongClickListener(
+                new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        game1Handler.setAnglaisouvietnamien(!game1Handler.getAnglaisouvietnamien());
+                        Toast.makeText(getApplicationContext(),"it's ok",Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+        );
+
         show_le_mot = (TextView)findViewById(R.id.show_le_mot_txt_4answer_game);
         answer1 = (TextView)findViewById(R.id.answer_1_4answer_game);
         answer2 = (TextView)findViewById(R.id.answer_2_4answer_game);
@@ -132,12 +157,20 @@ public class FourAnswerGameActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        setClickableAnswer(false);
                         handlerAfterClickAnswer(answer);
                     }
                 }
         );
     }
 
+    //vô hiệu hóa phím trả lời
+    private void setClickableAnswer(boolean onOff){
+        answer1.setClickable(onOff);
+        answer2.setClickable(onOff);
+        answer3.setClickable(onOff);
+        answer4.setClickable(onOff);
+    }
     //xử lý hiệu ứng + cộng trừ điểm sau click
     private void handlerAfterClickAnswer(TextView view){
         boolean para = checkAnswer(view.getText().toString());
@@ -155,11 +188,13 @@ public class FourAnswerGameActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // Do something after 2s = 2000ms
+
                 setContentAsking();
                 setDefaultAnswer();
 
             }
         }, 2000);
+
     }
 
     //kiểm tra câu trả lời đúng sai?
@@ -203,6 +238,8 @@ public class FourAnswerGameActivity extends AppCompatActivity {
 
 
     }
+
+
 
     //khởi tạo lại dao diện mặc định
     private void setDefaultAnswer(){

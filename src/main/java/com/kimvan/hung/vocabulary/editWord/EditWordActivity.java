@@ -105,28 +105,69 @@ public class EditWordActivity extends AppCompatActivity {
         }
     }
 
+    //when deleteButton is clicked
+    public void deleteClicked(View view){
+        if (!(posMeaningOnChanging == normalWordMeaning.size()-1)){
+            normalWordMeaning.remove(posMeaningOnChanging);
+        }
+        enAnglais.setText(normalWordMeaning.get(posMeaningOnChanging).get_enAnglais());
+        enVietnamien.setText(normalWordMeaning.get(posMeaningOnChanging).get_enVietnamien());
+
+    }
+    // when nextButton is clicked
     public void nextClicked(View view){
         saveState();
+        if (!isLastItemNull()){
+            normalWordMeaning.add(new NormalWordMeaning(normalWordMeaning.get(0).get_id()));
+        }
         posMeaningOnChanging=(posMeaningOnChanging+1)%normalWordMeaning.size();
         enAnglais.setText(normalWordMeaning.get(posMeaningOnChanging).get_enAnglais());
         enVietnamien.setText(normalWordMeaning.get(posMeaningOnChanging).get_enVietnamien());
+        if (enAnglais.getText().toString().equals("")){
+            enAnglais.setHint("type new");
+            enVietnamien.setHint("điền từ mới");
+        }
     }
 
+    //lưu lại các nghĩa đang chỉnh sửa
     private void saveState(){
-        nouveauMotAfter.set_leMot(leMot.getText().toString());
-        nouveauMotAfter.set_type_word(spinnerTypeWord.getSelectedItem().toString());
-        if (spinner_lv2_check){
-            nouveauMotAfter.set_lv2(spinnerLv2.getSelectedItem().toString());
-        }else {
-            nouveauMotAfter.set_lv2("");
+        String enAnglaisTxt = enAnglais.getText().toString();
+        String enVietnamienTxt = enVietnamien.getText().toString();
+        if (!(enAnglaisTxt.equals("") || enVietnamienTxt.equals(""))){
+            nouveauMotAfter.set_leMot(leMot.getText().toString());
+            nouveauMotAfter.set_type_word(spinnerTypeWord.getSelectedItem().toString());
+            if (spinner_lv2_check){
+                nouveauMotAfter.set_lv2(spinnerLv2.getSelectedItem().toString());
+            }else {
+                nouveauMotAfter.set_lv2("");
+            }
+            String stt = normalWordMeaning.get(posMeaningOnChanging).get_stt();
+            String id = normalWordMeaning.get(posMeaningOnChanging).get_id();
+            if (normalWordMeaning.size()>1){
+                normalWordMeaning.remove(posMeaningOnChanging);
+            }
+            normalWordMeaning.add(posMeaningOnChanging,new NormalWordMeaning(id,stt
+                    ,enAnglaisTxt,enVietnamienTxt));
         }
 
-        normalWordMeaning.remove(posMeaningOnChanging);
-        normalWordMeaning.add(posMeaningOnChanging,new NormalWordMeaning(nouveauMotPara.get_leMot(),enAnglais.getText().toString(),
-                enVietnamien.getText().toString()));
 
     }
 
+    // kiểm tra phần tử trống cuối cùng của list meaing para
+    private boolean isLastItemNull(){
+        //kiểm tra phần tử cuối là null hay ko?
+        try {
+            if (normalWordMeaning.get(normalWordMeaning.size()-1).get_enAnglais().equals("")){
+                //return true in the second time call this method
+                return true;
+            }
+        }catch (Exception e){
+            return true;
+        }
+        return false;
+    }
+
+    //lấy phần tử vị trí của spinner
     private int getPositionSpinner(String value,String[] t){
         for (int i=0;i<t.length;i++){
             if (value.equals(t[i])){
@@ -135,6 +176,8 @@ public class EditWordActivity extends AppCompatActivity {
         }
         return -1;
     }
+
+    //hiện ẩn spinner lv2
     private void setSpinner_type_lv2(String name){
         switch (name){
             case "le nom":
@@ -171,16 +214,20 @@ public class EditWordActivity extends AppCompatActivity {
         }
     }
 
+    //hiện thị thông tin từ cần sửa
     private void setUpTxt(){
         leMot.setText(nouveauMotPara.get_leMot());
-        normalWordMeaning = dbHandler.getNormalWordMeaning(nouveauMotPara.get_leMot());
+        normalWordMeaning = dbHandler.getNormalWordMeaning(nouveauMotPara.get_id());
         enAnglais.setText(normalWordMeaning.get(0).get_enAnglais());
         enVietnamien.setText(normalWordMeaning.get(0).get_enVietnamien());
         expertPoint.setText(String.valueOf(nouveauMotPara.get_expert_point()));
         nouveauMotPara.setColorExpert(shapeExpert);
 
+        normalWordMeaning.add(new NormalWordMeaning(nouveauMotPara.get_id()));
+
     }
 
+    //khởi tạo spinner
     private void createSpinner(){
         // create Spinner
         type_word = new String[]{"le nom","le pronom","le verbe","le adj","le article","le conjonction"};
@@ -223,26 +270,32 @@ public class EditWordActivity extends AppCompatActivity {
         }
     }
 
+    //tùy biến các button trên toolbar
     private void onClickToolbar(){
         saveToolbar.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         saveState();
-                        dbHandler.deleteTable(nouveauMotPara.get_leMot());
-                        dbHandler.createAnotherTable(leMot.getText().toString(),nouveauMotAfter.get_type_word());
+                        if (!(normalWordMeaning.size()<=1)){
+                            if (isLastItemNull()){
+                                normalWordMeaning.remove(normalWordMeaning.size()-1);
+                            }
+                            //xóa hết meaning add lại
+                            dbHandler.deleteMeaningById(nouveauMotAfter.get_id());
+                            for (int i=0;i<normalWordMeaning.size();i++){
+                                dbHandler.addMeaning(normalWordMeaning.get(i));
+                            }
 
-                        for (NormalWordMeaning x:normalWordMeaning){
-                            x.setNameWord(leMot.getText().toString());
-                            dbHandler.addMeaning(x);
-                        }
-                        dbHandler.updateWord(nouveauMotAfter);
+                            dbHandler.updateWord(nouveauMotAfter);//chỉnh sửa từ
 
 
-                        Toast.makeText(getApplicationContext(),"Từ đã được thay đổi!",Toast.LENGTH_SHORT).show();
-                        intent = new Intent(EditWordActivity.this,InformationActivity.class);
-                        startActivity(intent);
+                            Toast.makeText(getApplicationContext(),"Từ đã được thay đổi!",Toast.LENGTH_SHORT).show();
+                            intent = new Intent(EditWordActivity.this,InformationActivity.class);
+                            startActivity(intent);
 
+                        }else
+                            Toast.makeText(getApplicationContext(),"Không được để nghĩa trống!",Toast.LENGTH_SHORT).show();
                     }
                 }
         );

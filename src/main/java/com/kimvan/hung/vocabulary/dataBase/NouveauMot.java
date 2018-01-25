@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class NouveauMot implements Parcelable{
 
-    private int _id;
+    private String _id;
     private String _leMot;
     private String _type_word;
     private int _expert_point;
@@ -32,7 +32,7 @@ public class NouveauMot implements Parcelable{
         this._expert_point = 100;
     }
 
-    public NouveauMot(int _id, String _leMot, String _type_word,String _lv2 , int _expert_point) {
+    public NouveauMot(String _id, String _leMot, String _type_word,String _lv2 , int _expert_point) {
         this._id = _id;
         this._leMot = _leMot;
         this._type_word = _type_word;
@@ -56,11 +56,11 @@ public class NouveauMot implements Parcelable{
         this._lv2 = _lv2;
     }
 
-    public int get_id() {
+    public String get_id() {
         return _id;
     }
 
-    public void set_id(int _id) {
+    public void set_id(String _id) {
         this._id = _id;
     }
 
@@ -131,7 +131,7 @@ public class NouveauMot implements Parcelable{
     public NouveauMot(Parcel in){
         String[] data = new String[5];
         in.readStringArray(data);
-        set_id(Integer.parseInt(data[0]));
+        set_id(data[0]);
         set_leMot(data[1]);
         set_type_word(data[2]);
         set_lv2(data[3]);

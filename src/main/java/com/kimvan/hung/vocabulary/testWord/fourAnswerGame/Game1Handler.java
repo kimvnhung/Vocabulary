@@ -24,6 +24,7 @@ public class Game1Handler {
     DataBaseHandler dbHandler;
     NouveauMot nouveauMotSelected;
     NormalWordMeaning normalWordMeaningSelected;
+    Boolean anglaisouvietnamien=true;
 
 
     public Game1Handler(DataBaseHandler handler) {
@@ -40,6 +41,14 @@ public class Game1Handler {
 
     public NouveauMot getNouveauMotSelected() {
         return nouveauMotSelected;
+    }
+
+    public Boolean getAnglaisouvietnamien() {
+        return anglaisouvietnamien;
+    }
+
+    public void setAnglaisouvietnamien(Boolean anglaisouvietnamien) {
+        this.anglaisouvietnamien = anglaisouvietnamien;
     }
 
     public void setNouveauMotSelected(NouveauMot nouveauMotSelected) {
@@ -91,7 +100,7 @@ public class Game1Handler {
         c.moveToFirst();
         while (!c.isAfterLast()){
             result.add(new NouveauMot(
-                    c.getInt(c.getColumnIndex(dbHandler.COLUMN_ID)),
+                    c.getString(c.getColumnIndex(dbHandler.COLUMN_ID)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_LE_MOT)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_TYPE_WORD)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_LV2)),
@@ -107,16 +116,22 @@ public class Game1Handler {
         try {
             SQLiteDatabase db = dbHandler.getWritableDatabase();
             int point = getRandomPoint();
-            Cursor c = db.rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+
+            Cursor c = db.rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY +" WHERE "+
+                dbHandler.COLUMN_EXPERT_POINT+" IN (" +
+                    "SELECT v1." + dbHandler.COLUMN_EXPERT_POINT+" FROM "+dbHandler.TABLE_NAME_VOCABULARY+" AS V1, "+
+                    dbHandler.TABLE_NAME_VOCABULARY+" AS V2 WHERE v1." + dbHandler.COLUMN_EXPERT_POINT+"= v2." +
+                    dbHandler.COLUMN_EXPERT_POINT+" ORDER BY abs(v2." + dbHandler.COLUMN_EXPERT_POINT+" - "+point+ ") ASC, v1." +
+                    dbHandler.COLUMN_EXPERT_POINT+" DESC LIMIT 1 )",null);
+            /*Cursor c = db.rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+
                     dbHandler.COLUMN_EXPERT_POINT +" >= "+point+" ORDER BY "+dbHandler.COLUMN_EXPERT_POINT +" DESC",null);
             ArrayList<NouveauMot> para = getLeMot(c);
             if (c.getCount()==0){
                 c = db.rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+
                         dbHandler.COLUMN_EXPERT_POINT +" <= "+point+" ORDER BY "+dbHandler.COLUMN_EXPERT_POINT +" ASC",null);
-            }
-            c.moveToLast();
+            }*/
+            c.moveToFirst();
             result = new NouveauMot(
-                    c.getInt(c.getColumnIndex(dbHandler.COLUMN_ID)),
+                    c.getString(c.getColumnIndex(dbHandler.COLUMN_ID)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_LE_MOT)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_TYPE_WORD)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_LV2)),
@@ -130,12 +145,13 @@ public class Game1Handler {
         return result;
     }
 
-    //lấy nghĩa ngẫu nhiên từ 1 bảng nghĩa ngẫu nhiên
-    public NormalWordMeaning getRandomMeaning(String tableName){
+    //lấy nghĩa ngẫu nhiên từ 1 đã chọn
+    public NormalWordMeaning getRandomMeaning(String id){
         NormalWordMeaning result = new NormalWordMeaning();
         try {
             SQLiteDatabase db = dbHandler.getWritableDatabase();
-            Cursor c =db.rawQuery("SELECT * FROM " +tableName+" WHERE 1",null);
+            Cursor c =db.rawQuery("SELECT * FROM " +dbHandler.TABLE_NAME_MEANING+" WHERE "+
+                    dbHandler.COLUMN_ID+"=\""+id+"\"",null);
             int size =c.getCount();
             c.moveToFirst();
             size =(int)( size*Math.random());
@@ -143,8 +159,8 @@ public class Game1Handler {
                 c.moveToNext();
             }
             result = new NormalWordMeaning(
-                    c.getInt(c.getColumnIndex(dbHandler.COLUMN_STT)),
-                    tableName,
+                    c.getString(c.getColumnIndex(dbHandler.COLUMN_ID)),
+                    c.getString(c.getColumnIndex(dbHandler.COLUMN_STT)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_EN_ANGLAIS)),
                     c.getString(c.getColumnIndex(dbHandler.COLUMN_EN_VIETNAMIEN))
             );
@@ -155,6 +171,13 @@ public class Game1Handler {
         return result;
     }
 
+    public String getMeaning(NormalWordMeaning selected){
+        if (anglaisouvietnamien){
+            return selected.get_enVietnamien();
+        }else {
+            return selected.get_enAnglais();
+        }
+    }
     //lấy bộ đáp án
     //Should call at first
     public String[] getAnswer(){
@@ -162,8 +185,8 @@ public class Game1Handler {
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         setNouveauMotSelected(getMotNearRandomPoint());
 
-        setNormalWordMeaningSelected(getRandomMeaning(getNouveauMotSelected().get_leMot()));
-        result[0]= getNormalWordMeaningSelected().get_enVietnamien();
+        setNormalWordMeaningSelected(getRandomMeaning(getNouveauMotSelected().get_id()));
+        result[0]= getMeaning(getNormalWordMeaningSelected());
         int count =3;
         try {
             Cursor c = db.rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+" WHERE 1",null);
@@ -179,7 +202,7 @@ public class Game1Handler {
                 if (checkDoubleAnswer.equals(getNouveauMotSelected().get_leMot())){
 
                 }else {
-                    result[4-count] = getRandomMeaning(c.getString(c.getColumnIndex(dbHandler.COLUMN_LE_MOT))).get_enVietnamien();
+                    result[4-count] = getMeaning(getRandomMeaning(c.getString(c.getColumnIndex(dbHandler.COLUMN_ID))));
                     //check if is double answer
                     for (int i=0;i<4-count;i++){
                         if (result[i].equals(result[4-count])){
@@ -197,16 +220,35 @@ public class Game1Handler {
         return result;
     }
 
+    //lấy số từ có điểm = max hiện có trong database
+    public int getCountMaxPoint(){
+        int[] maxMin = getMaxMinPoint();
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT "+dbHandler.COLUMN_EXPERT_POINT+" FROM "+
+            dbHandler.TABLE_NAME_VOCABULARY+" WHERE "+dbHandler.COLUMN_EXPERT_POINT+" = "+maxMin[0],null);
+        return c.getCount();
+    }
+
+
     //lấy giá trị điểm expert bất kỳ
     public int getRandomPoint() {
         double random = Math.random();
         int result = 0;
         int[] maxMinPoint = getMaxMinPoint();
-        if (random<=0.7){
+        int N=dbHandler.getTableCount(dbHandler.TABLE_NAME_VOCABULARY);
+        int n=getCountMaxPoint();
+        double kPoint = 1-Math.pow((maxMinPoint[0]-maxMinPoint[1])/(double)(21*maxMinPoint[0]/20-19*maxMinPoint[1]/20),2);
+        if(n/N>kPoint){
+            maxMinPoint[0]= (int) ((Math.sqrt(N)/Math.sqrt(N-n))*(maxMinPoint[0]-maxMinPoint[1])+maxMinPoint[1]+0.5);
+        }else {
+            maxMinPoint[0]+=(int) ((maxMinPoint[0]-maxMinPoint[1])*0.05+0.5);
+        }
+        /*if (random<=0.7){
             result = (int)((maxMinPoint[1]-maxMinPoint[0])*random/1.4 + maxMinPoint[0]);
         }else {
             result = (int)((maxMinPoint[1]-maxMinPoint[0])*random/0.6+maxMinPoint[0]/0.6-2*maxMinPoint[1]/3);
-        }
+        }*/
+        result=(int)((maxMinPoint[0]-maxMinPoint[1])*Math.sqrt(random)+maxMinPoint[1]);
         return result;
     }
 

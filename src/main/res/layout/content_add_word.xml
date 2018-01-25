@@ -28,7 +28,8 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="10dp"
             android:layout_below="@+id/text_view_quel_de_neuf_add"
-            android:layout_marginLeft="15dp" />
+            android:layout_marginLeft="15dp"/>
+
 
         <LinearLayout
             android:id="@+id/layout_spinner_add"

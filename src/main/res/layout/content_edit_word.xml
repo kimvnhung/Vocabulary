@@ -76,17 +76,29 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/next_meaning_edit_word"
+            <LinearLayout
+                android:id="@+id/layout_button_edit_word"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
-                android:text="next"
-                android:onClick="nextClicked"/>
+                android:layout_centerInParent="true">
+                <Button
+                    android:id="@+id/next_meaning_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="next"
+                    android:onClick="nextClicked"/>
+                <Button
+                    android:id="@+id/delete_meaning_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="delete"
+                    android:onClick="deleteClicked"/>
+            </LinearLayout>
 
             <RelativeLayout
-                android:layout_toLeftOf="@+id/next_meaning_edit_word"
+                android:layout_toLeftOf="@+id/layout_button_edit_word"
                 android:id="@+id/layout_meaning_edit_word"
                 android:layout_margin="10dp"
                 android:layout_width="wrap_content"

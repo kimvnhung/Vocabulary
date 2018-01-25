@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,11 @@ import java.util.List;
 
 public class DataBaseHandler extends SQLiteOpenHelper {
 
+    private Context mContext;
     private static final int DATABASE_VERSION = 1 ;
     private static String DATABASE_NAME = "Vocabularys.db";
     public static final String TABLE_NAME_VOCABULARY = "vocabulary";
+    public static final String TABLE_NAME_MEANING = "meaning";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_LE_MOT = "_leMot";
     public static final String COLUMN_TYPE_WORD = "_typeWord";
@@ -46,12 +49,13 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public DataBaseHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, DATABASE_VERSION);
         this.DATABASE_NAME=name;
+        this.mContext = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_NAME_VOCABULARY+ "("+
-                COLUMN_ID +" INTERGER PRIMARY KEY, "+
+                COLUMN_ID +" TEXT PRIMARY KEY, "+
                 COLUMN_LE_MOT+" TEXT, "+
                 COLUMN_TYPE_WORD+" TEXT, "+
                 COLUMN_LV2+" TEXT,"+
@@ -63,6 +67,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_VOCABULARY);
+        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_NAME_MEANING);
         onCreate(db);
     }
 
@@ -87,36 +92,19 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             }
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Eror: resetAllData()",Toast.LENGTH_LONG).show();
         }
         onCreate(db);
-        /*String query = "SELECT * FROM "+TABLE_NAME_VOCABULARY +" WHERE 1";
-        Cursor c = db.rawQuery(query,null);
-        c.moveToFirst();
-        String motpara,typepara;
-        while (!c.isAfterLast()){
-            motpara = c.getString(c.getColumnIndex(COLUMN_LE_MOT));
-            typepara = c.getString(c.getColumnIndex(COLUMN_TYPE_WORD));
-            try {
-                db.execSQL("DELETE FROM "+TABLE_NAME_VOCABULARY+" WHERE "+COLUMN_LE_MOT +"=\""+motpara+"\"");
-                deleteTable(motpara);
-                if (typepara.equals("le verbe")){
-                    deleteTable(motpara+"lv2");
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
-            c.moveToNext();
-        }
-        db.close();*/
+
     }
 
-    public void createAnotherTable(String nameTable,String typeWord){
+    public void createTableMeaning(){
         SQLiteDatabase db = getWritableDatabase();
 
         try {
-            db.execSQL("DROP TABLE IF EXISTS " + nameTable);
-            String query = "CREATE TABLE " + nameTable+ "("+
-                    COLUMN_STT +" INTERGER PRIMARY KEY, "+
+            String query = "CREATE TABLE " + TABLE_NAME_MEANING+ "("+
+                    COLUMN_STT +" TEXT PRIMARY KEY, "+
+                    COLUMN_ID+" TEXT ,"+
                     COLUMN_EN_ANGLAIS+" TEXT, "+
                     COLUMN_EN_VIETNAMIEN+" TEXT "+
                     "); ";
@@ -124,69 +112,57 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             db.execSQL(query);
         }catch (Exception e){
             e.getMessage();
-        }
-
-        if (typeWord!=null){
-            if (typeWord.equals("le verbe")){
-                String query2 = "CREATE TABLE " + nameTable+"lv2"+ "("+
-                        COLUMN_ID +" INTERGER PRIMARY KEY, "+
-                        COLUMN_LE_TEMPS+" TEXT, "+
-                        COLUMN_JE+" TEXT, "+
-                        COLUMN_TU+" TEXT, "+
-                        COLUMN_IL_ELLE+" TEXT, "+
-                        COLUMN_NOUS+" TEXT, "+
-                        COLUMN_VOUS+" TEXT, "+
-                        COLUMN_ILS_ELLES+" TEXT "+
-                        "); ";
-                try {
-                    db.execSQL(query2);
-                }catch (Exception e){
-                    e.getMessage();
-                }
-            }
+            Toast.makeText(mContext,"Error: createTableMeaning()",Toast.LENGTH_LONG).show();
         }
     }
 
-    public void addWord(NouveauMot nouveauMot){
+    public void addWord(NouveauMot nouveauMot) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_LE_MOT,nouveauMot.get_leMot());
-        values.put(COLUMN_TYPE_WORD,nouveauMot.get_type_word());
-        values.put(COLUMN_LV2,nouveauMot.get_lv2());
-        values.put(COLUMN_EXPERT_POINT,nouveauMot.get_expert_point());
+        values.put(COLUMN_LE_MOT, nouveauMot.get_leMot());
+        values.put(COLUMN_TYPE_WORD, nouveauMot.get_type_word());
+        values.put(COLUMN_LV2, nouveauMot.get_lv2());
+        values.put(COLUMN_EXPERT_POINT, nouveauMot.get_expert_point());
 
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM "+TABLE_NAME_VOCABULARY+ " WHERE 1";
+        String query = "SELECT * FROM " + TABLE_NAME_VOCABULARY + " WHERE 1";
 
-        Cursor c = db.rawQuery(query,null);
-        values.put(COLUMN_ID,c.getCount());
+        Cursor c = db.rawQuery(query, null);
+        c.moveToLast();
 
-        db.insert(TABLE_NAME_VOCABULARY,null,values);
+        try {
+            values.put(COLUMN_ID, "W" + (getOrderFromId(c.getString(c.getColumnIndex(COLUMN_ID))) + 1));
+        } catch (Exception e) {
+            //trường hợp ko có phần tử nào ban đầu
+            values.put(COLUMN_ID, "W" + c.getCount());
+        }
+
+        db.insert(TABLE_NAME_VOCABULARY, null, values);
+
+
         db.close();
+        c.close();
     }
 
-    public void deleteWord(int id){
+    public void deleteWord(String id){
         SQLiteDatabase db = getWritableDatabase();
 
         Cursor c = db.rawQuery("SELECT *  FROM "+TABLE_NAME_VOCABULARY+" WHERE 1",null);
         c.moveToFirst();
 
-        String motPara = c.getString(c.getColumnIndex(COLUMN_LE_MOT));
-        String typePara = c.getString(c.getColumnIndex(COLUMN_TYPE_WORD));
         try {
-        String deleteQuery = "DELETE FROM " + TABLE_NAME_VOCABULARY +" WHERE "+COLUMN_ID +"="+id;
+        String deleteQuery = "DELETE FROM " + TABLE_NAME_VOCABULARY +" WHERE "+COLUMN_ID +"=\""+id+"\"";
 
 
             db.execSQL(deleteQuery);
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: deleteWord(String id)",Toast.LENGTH_LONG).show();
         }
+        //xóa nghĩa
+        deleteMeaningById(id);
 
-        deleteTable(motPara);
-        if (typePara.equals("le verbe")){
-            deleteTable(motPara+"lv2");
-        }
-        resetIdWord(id);
         db.close();
+        c.close();
     }
 
     public void updateWord(NouveauMot nouveauMot){
@@ -198,11 +174,12 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                     COLUMN_TYPE_WORD+"=\""+nouveauMot.get_type_word()+"\","+
                     COLUMN_LV2+"=\""+nouveauMot.get_lv2()+"\","+
                     COLUMN_EXPERT_POINT+"="+nouveauMot.get_expert_point()+" WHERE "+
-                    COLUMN_ID+"="+nouveauMot.get_id();
+                    COLUMN_ID+"=\""+nouveauMot.get_id()+"\"";
 
             db.execSQL(updateQuery);
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: updateWord(NouveauMot nouveauMot)",Toast.LENGTH_LONG).show();
         }
         db.close();
     }
@@ -216,42 +193,43 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
         int count =-1;
         try {
-            String query = "SELECT * FROM "+normalWordMeaning.getNameWord()+" WHERE 1 ";
+            String query = "SELECT * FROM "+TABLE_NAME_MEANING+" WHERE "+COLUMN_ID+" =\""+normalWordMeaning.get_id()+"\"";
             Cursor c = db.rawQuery(query,null);
-            count = c.getCount();
+            c.moveToLast();
+            count = getOrderFromStt(c.getString(c.getColumnIndex(COLUMN_STT)));
+            c.close();
         }catch (Exception e){
             e.getMessage();
+            //khi chưa tồn tại nghĩa
         }
 
-
-        if (count>= 0){
-            values.put(COLUMN_STT,count);
-            db.insert(normalWordMeaning.getNameWord(),null,values);
-        }
-
-
+        values.put(COLUMN_STT,normalWordMeaning.get_id()+"M"+(count+1));
+        values.put(COLUMN_ID,normalWordMeaning.get_id());
+        db.insert(TABLE_NAME_MEANING,null,values);
 
         db.close();
     }
 
-    public void deleteMeaning(String nameTable,int stt){
+    public void deleteMeaningByStt(String stt){//theo stt
         SQLiteDatabase db = getWritableDatabase();
         try {
-            String deleteQuery = "DELETE FROM " + nameTable +"WHERE "+COLUMN_STT +"="+stt;
+            String deleteQuery = "DELETE FROM " + TABLE_NAME_MEANING +" WHERE "+COLUMN_STT +"=\""+stt+"\"";
             db.execSQL(deleteQuery);
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: deleteMeaning(String stt)",Toast.LENGTH_LONG).show();
         }
         db.close();
     }
 
-    public void deleteTable(String nameTable){
+    public void deleteMeaningById(String id){//theo id
         SQLiteDatabase db = getWritableDatabase();
         try {
-            String query = "DROP TABLE IF EXISTS "+nameTable;
-            db.execSQL(query);
+            String deleteQuery = "DELETE FROM " + TABLE_NAME_MEANING +" WHERE "+COLUMN_ID +"=\""+id+"\"";
+            db.execSQL(deleteQuery);
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: deleteMeaning(String stt)",Toast.LENGTH_LONG).show();
         }
         db.close();
     }
@@ -260,77 +238,41 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         try {
-            String updateQuery = "UPDATE "+normalWordMeaning.getNameWord()+ " SET " +
-                    COLUMN_EN_ANGLAIS +"="+normalWordMeaning.get_enAnglais()+", "+
-                    COLUMN_EN_VIETNAMIEN+"="+normalWordMeaning.get_enVietnamien()+" WHERE "+
-                    COLUMN_STT+"="+normalWordMeaning.get_stt();
+            String updateQuery = "UPDATE "+TABLE_NAME_MEANING+ " SET " +
+                    COLUMN_ID +"=\""+normalWordMeaning.get_id()+"\","+
+                    COLUMN_EN_ANGLAIS +"=\""+normalWordMeaning.get_enAnglais()+"\", "+
+                    COLUMN_EN_VIETNAMIEN+"=\""+normalWordMeaning.get_enVietnamien()+"\" WHERE "+
+                    COLUMN_STT+"=\""+normalWordMeaning.get_stt()+"\"";
 
             db.execSQL(updateQuery);
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: updateMeaning(NormalWordMeaning normalWordMeaning)",Toast.LENGTH_LONG).show();
         }
         db.close();
     }
 
-    public void addConjugation(VerbWordMeaning verbWordMeaning){
-        SQLiteDatabase db =  getWritableDatabase();
-
-        for (int i =0;i<verbWordMeaning.getLesTemps().size();i++){
-            ContentValues values = new ContentValues();
-            Conjugation conjugation = verbWordMeaning.getLesTemps().get(i);
-
-
-            values.put(COLUMN_ID,conjugation.get_id());
-            values.put(COLUMN_LE_TEMPS,conjugation.get_leTemps());
-            values.put(COLUMN_JE,conjugation.get_je());
-            values.put(COLUMN_TU,conjugation.get_tu());
-            values.put(COLUMN_IL_ELLE,conjugation.get_ilElle());
-            values.put(COLUMN_NOUS,conjugation.get_nous());
-            values.put(COLUMN_VOUS,conjugation.get_vous());
-            values.put(COLUMN_ILS_ELLES,conjugation.get_ilsElles());
-
-            db.insert(verbWordMeaning.getNameWord()+"lv2",null,values);
-        }
-
-        db.close();
-    }
-
-    public void updateConjugation(String nameTable,Conjugation conjugation){
-        String query = "UPDATE "+nameTable +" SET "+
-                COLUMN_LE_TEMPS +"=\""+conjugation.get_leTemps()+"\","+
-                COLUMN_JE +"=\""+conjugation.get_je()+"\","+
-                COLUMN_TU +"=\""+conjugation.get_tu()+"\","+
-                COLUMN_IL_ELLE +"=\""+conjugation.get_ilElle()+"\","+
-                COLUMN_NOUS +"=\""+conjugation.get_nous()+"\","+
-                COLUMN_VOUS +"=\""+conjugation.get_vous()+"\","+
-                COLUMN_ILS_ELLES +"=\""+conjugation.get_ilsElles()+"\""+
-                " WHERE "+COLUMN_ID +"="+conjugation.get_id();
-
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(query);
-        db.close();
-    }
-
-    public ArrayList<NormalWordMeaning> getNormalWordMeaning(String mot){
+    public ArrayList<NormalWordMeaning> getNormalWordMeaning(String id){
         SQLiteDatabase db = getWritableDatabase();
         ArrayList<NormalWordMeaning> result= new ArrayList<>();
         try {
-            String query = "SELECT * FROM "+mot+" WHERE 1";
+            String query = "SELECT * FROM "+TABLE_NAME_MEANING+" WHERE "+COLUMN_ID+" =\""+id+"\"";
             Cursor c = db.rawQuery(query,null);
             c.moveToFirst();
 
             while (!c.isAfterLast()){
                 NormalWordMeaning normalWordMeaning = new NormalWordMeaning();
-                normalWordMeaning.set_stt(c.getInt(c.getColumnIndex(COLUMN_STT)));
+                normalWordMeaning.set_id(c.getString(c.getColumnIndex(COLUMN_ID)));
+                normalWordMeaning.set_stt(c.getString(c.getColumnIndex(COLUMN_STT)));
                 normalWordMeaning.set_enAnglais(c.getString(c.getColumnIndex(COLUMN_EN_ANGLAIS)));
                 normalWordMeaning.set_enVietnamien(c.getString(c.getColumnIndex(COLUMN_EN_VIETNAMIEN)));
-                normalWordMeaning.setNameWord(mot);
 
                 result.add(normalWordMeaning);
                 c.moveToNext();
             }
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: getNormalWordMeaning(String id)",Toast.LENGTH_LONG).show();
         }
         return result;
     }
@@ -343,12 +285,18 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(query,null);
         //Move to the first row in your resuits
         c.moveToFirst();
+        c.getCount();
+        NouveauMot nouveauMot = new NouveauMot();
+        try {
+             nouveauMot = new NouveauMot(leMot,c.getString(c.getColumnIndex(COLUMN_TYPE_WORD)),
+                    c.getString(c.getColumnIndex(COLUMN_LV2)));
 
-        NouveauMot nouveauMot = new NouveauMot(leMot,c.getString(c.getColumnIndex(COLUMN_TYPE_WORD)),
-               c.getString(c.getColumnIndex(COLUMN_LV2)));
-
-        nouveauMot.set_id(c.getInt(c.getColumnIndex(COLUMN_ID)));
-        nouveauMot.set_expert_point(c.getInt(c.getColumnIndex(COLUMN_EXPERT_POINT)));
+            nouveauMot.set_id(c.getString(c.getColumnIndex(COLUMN_ID)));
+            nouveauMot.set_expert_point(c.getInt(c.getColumnIndex(COLUMN_EXPERT_POINT)));
+        }catch (Exception e){
+            e.getMessage();
+            Toast.makeText(mContext,"Error: getNouveauMot(String leMot)",Toast.LENGTH_LONG).show();
+        }
 
         return nouveauMot;
 
@@ -358,10 +306,10 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         ArrayList<NouveauMot> result = new ArrayList<>();
         SQLiteDatabase db =  getWritableDatabase();
         String query = "SELECT * FROM "+ TABLE_NAME_VOCABULARY+" WHERE "+COLUMN_LE_MOT+" LIKE '%"+key+"%' ORDER BY "+
-                orderBy+" DESC";
+                orderBy+" ASC";
         if (key.equals("")){
             query = "SELECT * FROM "+TABLE_NAME_VOCABULARY+" ORDER BY "+
-            orderBy+" DESC";
+            orderBy+" ASC";
         }
         //cursor point to a location in your resuits
         Cursor c = db.rawQuery(query,null);
@@ -373,7 +321,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                     c.getString(c.getColumnIndex(COLUMN_TYPE_WORD)),
                     c.getString(c.getColumnIndex(COLUMN_LV2)));
 
-            nouveauMot.set_id(c.getInt(c.getColumnIndex(COLUMN_ID)));
+            nouveauMot.set_id(c.getString(c.getColumnIndex(COLUMN_ID)));
             nouveauMot.set_expert_point(c.getInt(c.getColumnIndex(COLUMN_EXPERT_POINT)));
             result.add(nouveauMot);
             c.moveToNext();
@@ -381,30 +329,68 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public void resetIdWord(int idCur){
-        SQLiteDatabase db = getWritableDatabase();
+    public int getOrderFromId(String id){
         try {
-            Cursor c = db.rawQuery("SELECT * FROM "+TABLE_NAME_VOCABULARY+" WHERE "+COLUMN_ID+" >="+idCur,null);
-            int paraCur =c.getCount();
-            int count=0;
-            c.moveToFirst();
-
-            while (count<paraCur){
-                String update = "UPDATE "+TABLE_NAME_VOCABULARY+" SET "+
-                        COLUMN_ID +"="+(idCur+count++)+
-                        " WHERE "+COLUMN_LE_MOT+"=\""+c.getString(c.getColumnIndex(COLUMN_LE_MOT))+"\"";
-                db.execSQL(update);
-                c.moveToNext();
-            }
+            StringBuilder result = new StringBuilder(id);
+            result.deleteCharAt(0);
+            return Integer.parseInt(result.toString());
         }catch (Exception e){
             e.getMessage();
+            Toast.makeText(mContext,"Error: getOrderFromId(String id)",Toast.LENGTH_LONG).show();
         }
+        return -1;
     }
 
-    public String fixName(String in){
+    public int getOrderFromStt(String stt){
+        try {
+            StringBuilder result = new StringBuilder(stt);
+            int length = result.length();
+            for (int i=0;i<length;){
+                if ((result.charAt(i)+"").equals("M")){
+                    result.deleteCharAt(i);
+                    break;
+                }
+                result.deleteCharAt(i);
+            }
+            return Integer.parseInt(result.toString());
+        }catch (Exception e){
+            e.getMessage();
+            Toast.makeText(mContext,"Error: getOrderFromStt(String stt)",Toast.LENGTH_LONG).show();
+        }
+        return -1;
+    }
 
-        StringBuilder out = new StringBuilder(in);
+    public boolean isExistItem(String tableName,String columnName,String item){
+        boolean result = false;
+        try {
+            Cursor c = getWritableDatabase().rawQuery("SELECT * FROM "+tableName+" WHERE "+columnName+"=\""+item+"\"",null);
+            if (c.getCount()>=1){
+                result = true;
+            }
+            c.close();
+        }catch (Exception e){
+            e.getMessage();
+            Toast.makeText(mContext,"Error: isExistItem(String tableName,String columnName,String item)"
+                    ,Toast.LENGTH_LONG).show();
+        }
+        return result;
+    }
 
-        return out.toString();
+    //lấy số phần tử trong bảng
+    public int getTableCount(String tableName){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM "+tableName,null);
+        return c.getCount();
+    }
+
+    public boolean isExistTableMeaning(){
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            Cursor c = db.rawQuery("SELECT * FROM "+TABLE_NAME_MEANING,null);
+        }catch (Exception e){
+            e.getMessage();
+            return false;
+        }
+        return true;
     }
 }

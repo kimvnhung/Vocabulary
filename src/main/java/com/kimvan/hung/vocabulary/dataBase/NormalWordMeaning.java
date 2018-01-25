@@ -9,21 +9,27 @@ import android.os.Parcelable;
 
 public class NormalWordMeaning implements Parcelable{
 
-    private int _stt;
-    private String nameWord;
+    private String _id;
+    private String _stt;
     private String _enAnglais,_enVietnamien;
 
-    public NormalWordMeaning(String nameWord, String _enAnglais, String _enVietnamien) {
-        this.nameWord = nameWord;
+    public NormalWordMeaning( String _enAnglais, String _enVietnamien) {
+
         this._enAnglais = _enAnglais;
         this._enVietnamien = _enVietnamien;
     }
 
 
 
-    public NormalWordMeaning(int _stt, String nameWord, String _enAnglais, String _enVietnamien) {
+    public NormalWordMeaning(String _stt, String _enAnglais, String _enVietnamien) {
         this._stt = _stt;
-        this.nameWord = nameWord;
+        this._enAnglais = _enAnglais;
+        this._enVietnamien = _enVietnamien;
+    }
+
+    public NormalWordMeaning(String _id, String _stt, String _enAnglais, String _enVietnamien) {
+        this._id = _id;
+        this._stt = _stt;
         this._enAnglais = _enAnglais;
         this._enVietnamien = _enVietnamien;
     }
@@ -32,24 +38,23 @@ public class NormalWordMeaning implements Parcelable{
 
     }
 
-    public NormalWordMeaning(String _enAnglais, String _enVietnamien) {
-        this._enAnglais = _enAnglais;
-        this._enVietnamien = _enVietnamien;
+    public NormalWordMeaning(String _id) {
+        this._id = _id;
     }
 
-    public String getNameWord() {
-        return nameWord;
+    public String get_id() {
+        return _id;
     }
 
-    public void setNameWord(String nameWord) {
-        this.nameWord = nameWord;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public int get_stt() {
+    public String get_stt() {
         return _stt;
     }
 
-    public void set_stt(int _stt) {
+    public void set_stt(String _stt) {
         this._stt = _stt;
     }
 
@@ -76,17 +81,16 @@ public class NormalWordMeaning implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{String.valueOf(get_stt()),getNameWord(),
+        dest.writeStringArray(new String[]{String.valueOf(get_stt()),
                 get_enAnglais(),get_enVietnamien()});
     }
 
     public NormalWordMeaning(Parcel in){
         String[] data = new String[4];
         in.readStringArray(data);
-        set_stt(Integer.parseInt(data[0]));
-        setNameWord(data[1]);
-        set_enAnglais(data[2]);
-        set_enVietnamien(data[3]);
+        set_stt(data[0]);
+        set_enAnglais(data[1]);
+        set_enVietnamien(data[2]);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

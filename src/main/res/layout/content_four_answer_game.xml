@@ -10,6 +10,7 @@
     tools:showIn="@layout/activity_four_answer_game">
 
     <RelativeLayout
+        android:id="@+id/layout_question_4answer_game"
         android:background="@drawable/border_rectang"
         android:layout_weight="1"
         android:padding="15dp"

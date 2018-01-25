@@ -58,15 +58,13 @@ public class TestWordActivity extends AppCompatActivity {
                                 switch (position){
                                     case 0:
                                         try {
-                                            Cursor c = dbHandler.getWritableDatabase().rawQuery("SELECT * FROM "+dbHandler.TABLE_NAME_VOCABULARY+
-                                                    " WHERE 1",null);
-                                            if (c.getCount()<4){
+                                            int c=dbHandler.getTableCount(dbHandler.TABLE_NAME_VOCABULARY);
+                                            if (c<=4){
                                                 Toast.makeText(getApplicationContext(),"Dữ liệu phải nhiều hơn 4 từ!!",Toast.LENGTH_SHORT).show();
                                             }else {
                                                 intent = new Intent(TestWordActivity.this,FourAnswerGameActivity.class);
                                                 startActivity(intent);
                                             }
-                                            c.close();
                                         }catch (Exception e){
                                             e.getMessage();
                                         }
