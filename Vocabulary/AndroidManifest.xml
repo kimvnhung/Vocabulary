@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kimvan.hung.vocabulary">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_main"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".addWord.AddWordActivity"
+            android:label="@string/title_add_word_toolbar"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".testWord.TestWordActivity"
+            android:label="@string/title_test_word"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".editWord.EditWordActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".Information.InformationActivity"
+            android:label="@string/title_information"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".addWord.ConjugationInput"
+            android:label="@string/title_add_word_toolbar"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".testWord.fourAnswerGame.FourAnswerGameActivity"
+            android:label="@string/title_activity_four_answer_game"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+    </application>
+
+</manifest>

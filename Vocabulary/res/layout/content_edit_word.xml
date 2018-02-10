@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_edit_word">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/le_mot_txt_edit_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Le Mot"/>
+            <EditText
+                android:id="@+id/le_mot_edit_txt_edit_word"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/le_mot_txt_edit_word"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/type_word_txt_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="Type word"/>
+                <Spinner
+                    android:id="@+id/spinner_type_word_edit"
+                    android:layout_below="@+id/type_word_txt_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_height="wrap_content">
+
+                </Spinner>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout_lv2_edit_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/lv2_txt_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="lv2"/>
+                <Spinner
+                    android:id="@+id/spinner_type_word_lv2_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/lv2_txt_edit_word">
+
+                </Spinner>
+            </RelativeLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/layout_button_edit_word"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true">
+                <Button
+                    android:id="@+id/next_meaning_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="next"
+                    android:onClick="nextClicked"/>
+                <Button
+                    android:id="@+id/delete_meaning_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="delete"
+                    android:onClick="deleteClicked"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_toLeftOf="@+id/layout_button_edit_word"
+                android:id="@+id/layout_meaning_edit_word"
+                android:layout_margin="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/en_englais_txt_edit_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="En anglais"/>
+                <EditText
+                    android:id="@+id/en_englais_edit_txt_edit_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/en_englais_txt_edit_word"/>
+
+                <TextView
+                    android:id="@+id/en_vietnamien_txt_edit_word"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/en_englais_edit_txt_edit_word"
+                    android:text="En vietnamien"/>
+                <EditText
+                    android:id="@+id/en_vietnamien_edit_txt_edit_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/en_vietnamien_txt_edit_word"/>
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/expert_point_txt_edit_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="lv2"
+                android:layout_centerHorizontal="true"/>
+            <TextView
+                android:id="@+id/shape_expert_point_edit_word"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rectang_expert_point"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/expert_point_txt_edit_word"/>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

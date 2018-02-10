@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorTitileMain">#ffffff</color>
+    <color name="colorBackgroundButton">#3333ff</color>
+    <color name="colorClicked">#B0E0E6</color>
+
+    <color name="colorExpert">#79f480</color>
+    <color name="colorAvanced">#2dc937</color>
+    <color name="colorExperienced">#99c140</color>
+    <color name="colorIntermediate">#e7b416</color>
+    <color name="colorSkilled">#db7b2b</color>
+    <color name="colorBeginner">#cc3232</color>
+    <color name="colorTerrible">#8b1a1a</color>
+</resources>
