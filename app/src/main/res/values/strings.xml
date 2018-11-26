@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Dictionary de Hùng</string>
+    <string name="app_name_version2">Demo</string>
+    <string name="ajouter_un_mot">Ajouter un Mot</string>
+    <string name="tester_les_mot">Tester les Mot</string>
+    <string name="vocabulary_de_francais">Vocabulary De Francais</string>
+    <string name="quelle_de_neuf">* Quelle de neuf?</string>
+    <string name="en_anglais">*En anglais</string>
+    <string name="en_vietnamien">*En vietnamien</string>
+    <string name="ajouter_le_mot">Ajouter le mot</string>
+
+    <string name="title_add_word_toolbar">Nouveau Mot</string>
+    <string name="title_activity_conjugation_input">ConjugationInput</string>
+    <string name="title_information">Information</string>
+    <string name="title_test_word">Test Word</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="ghi_de">Bạn có muốn ghi đè dữ liệu đã có?</string>
+    <string name="add_complete">Thêm từ thành công!</string>
+
+    <string name="example">example</string>
+    <string name="title_activity_four_answer_game">Four Answer</string>
+    <string name="delete_all">Delete All</string>
+    <string name="title_activity_order_your_word">Order Letter</string>
+</resources>
